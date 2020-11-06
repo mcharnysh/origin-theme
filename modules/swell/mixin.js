@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import get from 'lodash/get'
+import { find, minBy, get } from 'lodash'
 
 // Components
 import VisualMedia from '~/modules/swell/components/VisualMedia'
@@ -9,13 +9,34 @@ Vue.use({
     Vue.mixin({
       methods: {
         formatMoney,
-        resolveUrl
+        resolveUrl,
+        getProductPrice
       }
     })
 
     Vue.component('VisualMedia', VisualMedia)
   }
 })
+
+function getProductPrice(product) {
+  switch(product.type) {
+    case 'giftcard': 
+      return getGiftcardProductPrice.call(this, product);
+    default: 
+      return this.formatMoney(product.price);
+  }
+}
+
+function getGiftcardProductPrice(product) {
+  const denominations = find(product.options, o => o.name === 'Value');
+  if (!denominations) {
+    return this.formatMoney(product.price);
+  }
+
+  const lowestDenomination = minBy(denominations.values, v => v.price);
+  return this.formatMoney(lowestDenomination.price); 
+}
+
 
 function settings(self, id, def = undefined) {
   return get(self, `$store.$swell.settings.state.${id}`, def)
