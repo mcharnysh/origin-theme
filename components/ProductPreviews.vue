@@ -72,7 +72,7 @@
           </div>
           <!-- Regular price -->
           <div v-else>
-            <span class="text-sm">{{ formatMoney(product.price) }}</span>
+            <span class="text-sm">{{ getProductPrice(product) }}</span>
           </div>
         </div>
       </div>
